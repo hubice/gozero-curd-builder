@@ -1,0 +1,74 @@
+syntax = "v1"
+
+info(
+	title: "中医-后台管理"
+	desc: "中医-后台管理."
+	author: "horizon"
+	email: "horizon@email.com"
+	version: "v1.0"
+)
+
+type (
+	Add{{.table}}Req {
+	}
+	Add{{.table}}Resp {
+	}
+	Update{{.table}}Req {
+	}
+	Update{{.table}}Resp {
+	}
+	Del{{.table}}Req {
+	}
+	Del{{.table}}Resp {
+	}
+	Info{{.table}}Req {
+	}
+	Info{{.table}}Resp {
+	}
+	List{{.table}}Req {
+	}
+	List{{.table}}Resp {
+	}
+)
+
+service {{.service}} {
+	@doc(
+		summary: "添加{{.table}}"
+	)
+	@server(
+		handler: Add{{.table}}Handler
+	)
+	post /medicine-{{.service}}/{{.table}}/add(Add{{.table}}Req) returns (Add{{.table}}Resp)
+
+	@doc(
+		summary: "修改{{.table}}"
+	)
+	@server(
+		handler: Update{{.table}}Handler
+	)
+	post /medicine-{{.service}}/{{.table}}/update(Update{{.table}}Req) returns (Update{{.table}}Resp)
+
+	@doc(
+		summary: "删除{{.table}}"
+	)
+	@server(
+		handler: Del{{.table}}Handler
+	)
+	get /medicine-{{.service}}/{{.table}}/del(Del{{.table}}Req) returns (Del{{.table}}Resp)
+
+	@doc(
+		summary: "详情{{.table}}"
+	)
+	@server(
+		handler: Info{{.table}}Handler
+	)
+	get /medicine-{{.service}}/{{.table}}/info(Info{{.table}}Req) returns (Info{{.table}}Resp)
+
+	@doc(
+		summary: "列表{{.table}}"
+	)
+	@server(
+		handler: List{{.table}}Handler
+	)
+	get /medicine-{{.service}}/{{.table}}/list(List{{.table}}Req) returns (List{{.table}}Resp)
+}
