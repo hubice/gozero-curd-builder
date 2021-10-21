@@ -27,6 +27,7 @@ type TmplRecipient struct {
 	Table        string
 	Service      string
 	TableDecList []TableDec
+	TableDecListExpectAutoSet []TableDec
 }
 
 type TableDec struct {
@@ -73,6 +74,12 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	tableDecListExpectAutoSet :=make([]TableDec, 0, len(tableDecList))
+	for _, v := range tableDecList {
+		if v.Field != "id" && v.Field != "create_time" && v.Field != "update_time" && v.Field != "delete_time" {
+			tableDecListExpectAutoSet = append(tableDecListExpectAutoSet, v)
+		}
+	}
 	for _, v := range files {
 		buff := bytes.Buffer{}
 		data, err := ioutil.ReadFile(fmt.Sprintf("./tmpl/%v.tmpl", v))
@@ -92,6 +99,7 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 			Table:        table,
 			Service:      *service,
 			TableDecList: tableDecList,
+			TableDecListExpectAutoSet: tableDecListExpectAutoSet,
 		})
 		if err != nil {
 			return err

@@ -14,6 +14,29 @@ func (m *{{Case2Camel .Table}}Model) Insert(data {{Case2Camel .Table}}) (int64, 
 	return ret.LastInsertId()
 }
 
+func (m *{{Case2Camel .Table}}Model) List(page, pageSize int) ([]*{{Case2Camel .Table}}, int64, error) {
+	where := builder.Eq{}
+
+	var total int64
+	resp := make([]*{{Case2Camel .Table}}, 0)
+	err := mr.Finish(func() error {
+		offset := (page - 1) * pageSize
+		query, args, err := builder.Dialect(builder.MYSQL).Select({{Case2CamelFirst .Table}}Rows).From(m.table).Where(where).Limit(pageSize, offset).ToSQL()
+		if err != nil {
+			return err
+		}
+		return m.conn.QueryRows(&resp, query, args...)
+	}, func() error {
+		query, args, err := builder.Select("COUNT(*) as total").From(m.table).Where(where).ToSQL()
+		if err != nil {
+			return err
+		}
+		return m.conn.QueryRow(&total, query, args...)
+	})
+	return resp, total, err
+}
+
+
 func (m *{{Case2Camel .Table}}Model) InsertAll(list []*{{Case2Camel .Table}}) error {
 	insert := builder.Eq{
         {{range $key, $value := .TableDecList}}"{{$value.Field}}": "",

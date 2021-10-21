@@ -10,14 +10,15 @@ info(
 
 type (
 	Add{{Case2Camel .Table}}Req {
-	    {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
+	    {{range $key, $value := .TableDecListExpectAutoSet}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
 	    {{end}}
 	}
 	Add{{Case2Camel .Table}}Resp {
 		Id int64 `json:"id"`
 	}
 	Update{{Case2Camel .Table}}Req {
-        {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
+	    Id int64 `json:"id"`
+        {{range $key, $value := .TableDecListExpectAutoSet}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
         {{end}}
 	}
 	Update{{Case2Camel .Table}}Resp {
@@ -46,6 +47,7 @@ type (
 	}
 	List{{Case2Camel .Table}}Resp {
 	    {{Case2Camel .Table}}List []{{Case2Camel .Table}} `json:"{{Case2CamelFirst .Table}}"`
+	    Total    int64  `json:"total"`
 	}
 )
 
