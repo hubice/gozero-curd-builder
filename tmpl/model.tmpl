@@ -1,0 +1,61 @@
+func (m *{{Case2Camel .Table}}Model) Insert(data {{Case2Camel .Table}}) (int64, error) {
+	insert := builder.Eq{
+        {{range $key, $value := .TableDecList}}"{{$value.Field}}": data.{{Case2Camel $value.Field}},
+        {{end}}
+	}
+	toSQL, i, err := builder.Insert(insert).Into(m.table).ToSQL()
+	if err != nil {
+		return 0, err
+	}
+	ret, err := m.conn.Exec(toSQL, i...)
+	if err != nil {
+		return 0, err
+	}
+	return ret.LastInsertId()
+}
+
+func (m *{{Case2Camel .Table}}Model) InsertAll(list []*{{Case2Camel .Table}}) error {
+	insert := builder.Eq{
+        {{range $key, $value := .TableDecList}}"{{$value.Field}}": "",
+        {{end}}
+	}
+	query, _, err := builder.Insert(insert).Into(m.table).ToSQL()
+	if err != nil {
+		return err
+	}
+	var bulk *sqlx.BulkInserter
+	bulk, _ = sqlx.NewBulkInserter(m.conn, query) //注意：批量插入不能重复实例化
+	for i, data := range list {
+		insert := builder.Eq{
+	        {{range $key, $value := .TableDecList}}"{{$value.Field}}": data.{{Case2Camel $value.Field}},
+            {{end}}
+		}
+		_, args, err := builder.Insert(insert).Into(m.table).ToSQL()
+		err = bulk.Insert(args...)
+		if err != nil {
+			logx.Errorf("called {{Case2Camel .Table}}Model InsertAll exec: %s", err)
+			continue
+		}
+		if i != 0 && i%1000 == 0 {
+			bulk.Flush()
+		}
+	}
+	bulk.Flush()
+	return nil
+}
+
+func (m *{{Case2Camel .Table}}Model) Update(data {{Case2Camel .Table}}) error {
+	update := builder.Eq{
+        {{range $key, $value := .TableDecList}}"{{$value.Field}}": data.{{Case2Camel $value.Field}},
+        {{end}}
+	}
+	toSQL, i, err := builder.Update(update).From(m.table).Where(builder.Eq{"id": data.Id}).ToSQL()
+	if err != nil {
+		return err
+	}
+	_, err = m.conn.Exec(toSQL, i...)
+	if err != nil {
+		return err
+	}
+	return err
+}

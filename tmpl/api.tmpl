@@ -9,66 +9,84 @@ info(
 )
 
 type (
-	Add{{.table}}Req {
+	Add{{Case2Camel .Table}}Req {
+	    {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
+	    {{end}}
 	}
-	Add{{.table}}Resp {
+	Add{{Case2Camel .Table}}Resp {
+		Id int64 `json:"id"`
 	}
-	Update{{.table}}Req {
+	Update{{Case2Camel .Table}}Req {
+        {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
+        {{end}}
 	}
-	Update{{.table}}Resp {
+	Update{{Case2Camel .Table}}Resp {
+	    Id int64 `json:"id"`
 	}
-	Del{{.table}}Req {
+	Del{{Case2Camel .Table}}Req {
+	    Id int64 `form:"id"`
 	}
-	Del{{.table}}Resp {
+	Del{{Case2Camel .Table}}Resp {
+	    Id int64 `json:"id"`
 	}
-	Info{{.table}}Req {
+	Info{{Case2Camel .Table}}Req {
+	    Id int64 `form:"id"`
 	}
-	Info{{.table}}Resp {
+	Info{{Case2Camel .Table}}Resp {
+	    {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}}"`
+        {{end}}
 	}
-	List{{.table}}Req {
+	{{Case2Camel .Table}} {
+        {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}}"`
+        {{end}}
+    }
+	List{{Case2Camel .Table}}Req {
+        Page       int    `form:"page,default=1,range=[1:200]"`
+        PageSize   int    `form:"pageSize,options=10|20|30|40,default=10"`
 	}
-	List{{.table}}Resp {
+	List{{Case2Camel .Table}}Resp {
+	    {{Case2Camel .Table}}List []{{Case2Camel .Table}} `json:"{{Case2CamelFirst .Table}}"`
 	}
 )
 
-service {{.service}} {
+service {{Case2Mid .Service}} {
 	@doc(
-		summary: "添加{{.table}}"
+		summary: "添加{{Case2Camel .Table}}"
 	)
 	@server(
-		handler: Add{{.table}}Handler
+		handler: Add{{Case2Camel .Table}}Handler
 	)
-	post /medicine-{{.service}}/{{.table}}/add(Add{{.table}}Req) returns (Add{{.table}}Resp)
+	post /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/add(Add{{Case2Camel .Table}}Req) returns (Add{{Case2Camel .Table}}Resp)
 
 	@doc(
-		summary: "修改{{.table}}"
+		summary: "修改{{Case2Camel .Table}}"
 	)
 	@server(
-		handler: Update{{.table}}Handler
+		handler: Update{{Case2Camel .Table}}Handler
 	)
-	post /medicine-{{.service}}/{{.table}}/update(Update{{.table}}Req) returns (Update{{.table}}Resp)
+	post /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/update(Update{{Case2Camel .Table}}Req) returns (Update{{Case2Camel .Table}}Resp)
 
 	@doc(
-		summary: "删除{{.table}}"
+		summary: "删除{{Case2Camel .Table}}"
 	)
 	@server(
-		handler: Del{{.table}}Handler
+		handler: Del{{Case2Camel .Table}}Handler
 	)
-	get /medicine-{{.service}}/{{.table}}/del(Del{{.table}}Req) returns (Del{{.table}}Resp)
+	get /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/del(Del{{Case2Camel .Table}}Req) returns (Del{{Case2Camel .Table}}Resp)
 
 	@doc(
-		summary: "详情{{.table}}"
+		summary: "详情{{Case2Camel .Table}}"
 	)
 	@server(
-		handler: Info{{.table}}Handler
+		handler: Info{{Case2Camel .Table}}Handler
 	)
-	get /medicine-{{.service}}/{{.table}}/info(Info{{.table}}Req) returns (Info{{.table}}Resp)
+	get /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/info(Info{{Case2Camel .Table}}Req) returns (Info{{Case2Camel .Table}}Resp)
 
 	@doc(
-		summary: "列表{{.table}}"
+		summary: "列表{{Case2Camel .Table}}"
 	)
 	@server(
-		handler: List{{.table}}Handler
+		handler: List{{Case2Camel .Table}}Handler
 	)
-	get /medicine-{{.service}}/{{.table}}/list(List{{.table}}Req) returns (List{{.table}}Resp)
+	get /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/list(List{{Case2Camel .Table}}Req) returns (List{{Case2Camel .Table}}Resp)
 }
