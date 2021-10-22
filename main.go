@@ -104,12 +104,12 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			_ = os.MkdirAll(fmt.Sprintf("./builder/%v/", Case2Empty(table)), 0666)
+			_ = os.MkdirAll(fmt.Sprintf("./tmpl/builder/%v/", Case2Empty(table)), 0666)
 			suffix := ".go"
 			if strings.Contains(v.Name(), "api") {
 				suffix = ".api"
 			}
-			_ = ioutil.WriteFile(fmt.Sprintf("./builder/%v/%v", Case2Empty(table), Case2Empty(fmt.Sprintf("%v%v%v",table, strings.Replace(v.Name(), ".", "", -1), suffix))), buff.Bytes(), 0666)
+			_ = ioutil.WriteFile(fmt.Sprintf("./tmpl/builder/%v/%v", Case2Empty(table), Case2Empty(fmt.Sprintf("%v%v%v",table, strings.Replace(v.Name(), ".", "", -1), suffix))), buff.Bytes(), 0666)
 		}
 	}
 	return nil
