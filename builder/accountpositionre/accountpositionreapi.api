@@ -1,0 +1,106 @@
+syntax = "v1"
+
+info(
+	title: "中医-后台管理"
+	desc: "中医-后台管理."
+	author: "horizon"
+	email: "horizon@email.com"
+	version: "v1.0"
+)
+
+type (
+	AddAccountPositionReReq {
+	    BrandId int64 `json:"brandId,optional"`
+	    PositionId int64 `json:"positionId,optional"`
+	    AccountId int64 `json:"accountId,optional"`
+	    
+	}
+	AddAccountPositionReResp {
+		Id int64 `json:"id"`
+	}
+	UpdateAccountPositionReReq {
+	    Id int64 `json:"id"`
+        BrandId int64 `json:"brandId,optional"`
+        PositionId int64 `json:"positionId,optional"`
+        AccountId int64 `json:"accountId,optional"`
+        
+	}
+	UpdateAccountPositionReResp {
+	    Id int64 `json:"id"`
+	}
+	DelAccountPositionReReq {
+	    Id int64 `form:"id"`
+	}
+	DelAccountPositionReResp {
+	    Id int64 `json:"id"`
+	}
+	InfoAccountPositionReReq {
+	    Id int64 `form:"id"`
+	}
+	InfoAccountPositionReResp {
+	    Id int64 `json:"id"`
+        BrandId int64 `json:"brandId"`
+        PositionId int64 `json:"positionId"`
+        AccountId int64 `json:"accountId"`
+        CreateTime int64 `json:"createTime"`
+        
+	}
+	AccountPositionRe {
+        Id int64 `json:"id"`
+        BrandId int64 `json:"brandId"`
+        PositionId int64 `json:"positionId"`
+        AccountId int64 `json:"accountId"`
+        CreateTime int64 `json:"createTime"`
+        
+    }
+	ListAccountPositionReReq {
+        Page       int    `form:"page,default=1,range=[1:200]"`
+        PageSize   int    `form:"pageSize,options=10|20|30|40,default=10"`
+	}
+	ListAccountPositionReResp {
+	    AccountPositionReList []AccountPositionRe `json:"accountPositionRe"`
+	    Total    int64  `json:"total"`
+	}
+)
+
+service account {
+	@doc(
+		summary: "添加AccountPositionRe"
+	)
+	@server(
+		handler: AddAccountPositionReHandler
+	)
+	post /medicine-account/account-position-re/add(AddAccountPositionReReq) returns (AddAccountPositionReResp)
+
+	@doc(
+		summary: "修改AccountPositionRe"
+	)
+	@server(
+		handler: UpdateAccountPositionReHandler
+	)
+	post /medicine-account/account-position-re/update(UpdateAccountPositionReReq) returns (UpdateAccountPositionReResp)
+
+	@doc(
+		summary: "删除AccountPositionRe"
+	)
+	@server(
+		handler: DelAccountPositionReHandler
+	)
+	get /medicine-account/account-position-re/del(DelAccountPositionReReq) returns (DelAccountPositionReResp)
+
+	@doc(
+		summary: "详情AccountPositionRe"
+	)
+	@server(
+		handler: InfoAccountPositionReHandler
+	)
+	get /medicine-account/account-position-re/info(InfoAccountPositionReReq) returns (InfoAccountPositionReResp)
+
+	@doc(
+		summary: "列表AccountPositionRe"
+	)
+	@server(
+		handler: ListAccountPositionReHandler
+	)
+	get /medicine-account/account-position-re/list(ListAccountPositionReReq) returns (ListAccountPositionReResp)
+}

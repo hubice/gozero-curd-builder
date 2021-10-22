@@ -1,0 +1,134 @@
+syntax = "v1"
+
+info(
+	title: "中医-后台管理"
+	desc: "中医-后台管理."
+	author: "horizon"
+	email: "horizon@email.com"
+	version: "v1.0"
+)
+
+type (
+	AddMenuReq {
+	    Channel int64 `json:"channel,optional"`
+	    ParentId int64 `json:"parentId,optional"`
+	    Name string `json:"name,optional"`
+	    Icon string `json:"icon,optional"`
+	    IconColor string `json:"iconColor,optional"`
+	    UrlType int64 `json:"urlType,optional"`
+	    UrlPath string `json:"urlPath,optional"`
+	    Remark string `json:"remark,optional"`
+	    Sort int64 `json:"sort,optional"`
+	    
+	}
+	AddMenuResp {
+		Id int64 `json:"id"`
+	}
+	UpdateMenuReq {
+	    Id int64 `json:"id"`
+        Channel int64 `json:"channel,optional"`
+        ParentId int64 `json:"parentId,optional"`
+        Name string `json:"name,optional"`
+        Icon string `json:"icon,optional"`
+        IconColor string `json:"iconColor,optional"`
+        UrlType int64 `json:"urlType,optional"`
+        UrlPath string `json:"urlPath,optional"`
+        Remark string `json:"remark,optional"`
+        Sort int64 `json:"sort,optional"`
+        
+	}
+	UpdateMenuResp {
+	    Id int64 `json:"id"`
+	}
+	DelMenuReq {
+	    Id int64 `form:"id"`
+	}
+	DelMenuResp {
+	    Id int64 `json:"id"`
+	}
+	InfoMenuReq {
+	    Id int64 `form:"id"`
+	}
+	InfoMenuResp {
+	    Id int64 `json:"id"`
+        Channel int64 `json:"channel"`
+        ParentId int64 `json:"parentId"`
+        Name string `json:"name"`
+        Icon string `json:"icon"`
+        IconColor string `json:"iconColor"`
+        UrlType int64 `json:"urlType"`
+        UrlPath string `json:"urlPath"`
+        Remark string `json:"remark"`
+        Sort int64 `json:"sort"`
+        DeleteTime int64 `json:"deleteTime"`
+        CreateTime int64 `json:"createTime"`
+        UpdateTime int64 `json:"updateTime"`
+        
+	}
+	Menu {
+        Id int64 `json:"id"`
+        Channel int64 `json:"channel"`
+        ParentId int64 `json:"parentId"`
+        Name string `json:"name"`
+        Icon string `json:"icon"`
+        IconColor string `json:"iconColor"`
+        UrlType int64 `json:"urlType"`
+        UrlPath string `json:"urlPath"`
+        Remark string `json:"remark"`
+        Sort int64 `json:"sort"`
+        DeleteTime int64 `json:"deleteTime"`
+        CreateTime int64 `json:"createTime"`
+        UpdateTime int64 `json:"updateTime"`
+        
+    }
+	ListMenuReq {
+        Page       int    `form:"page,default=1,range=[1:200]"`
+        PageSize   int    `form:"pageSize,options=10|20|30|40,default=10"`
+	}
+	ListMenuResp {
+	    MenuList []Menu `json:"menu"`
+	    Total    int64  `json:"total"`
+	}
+)
+
+service account {
+	@doc(
+		summary: "添加Menu"
+	)
+	@server(
+		handler: AddMenuHandler
+	)
+	post /medicine-account/menu/add(AddMenuReq) returns (AddMenuResp)
+
+	@doc(
+		summary: "修改Menu"
+	)
+	@server(
+		handler: UpdateMenuHandler
+	)
+	post /medicine-account/menu/update(UpdateMenuReq) returns (UpdateMenuResp)
+
+	@doc(
+		summary: "删除Menu"
+	)
+	@server(
+		handler: DelMenuHandler
+	)
+	get /medicine-account/menu/del(DelMenuReq) returns (DelMenuResp)
+
+	@doc(
+		summary: "详情Menu"
+	)
+	@server(
+		handler: InfoMenuHandler
+	)
+	get /medicine-account/menu/info(InfoMenuReq) returns (InfoMenuResp)
+
+	@doc(
+		summary: "列表Menu"
+	)
+	@server(
+		handler: ListMenuHandler
+	)
+	get /medicine-account/menu/list(ListMenuReq) returns (ListMenuResp)
+}

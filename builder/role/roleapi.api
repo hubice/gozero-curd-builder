@@ -1,0 +1,110 @@
+syntax = "v1"
+
+info(
+	title: "中医-后台管理"
+	desc: "中医-后台管理."
+	author: "horizon"
+	email: "horizon@email.com"
+	version: "v1.0"
+)
+
+type (
+	AddRoleReq {
+	    BrandId int64 `json:"brandId,optional"`
+	    Name string `json:"name,optional"`
+	    Introduce string `json:"introduce,optional"`
+	    
+	}
+	AddRoleResp {
+		Id int64 `json:"id"`
+	}
+	UpdateRoleReq {
+	    Id int64 `json:"id"`
+        BrandId int64 `json:"brandId,optional"`
+        Name string `json:"name,optional"`
+        Introduce string `json:"introduce,optional"`
+        
+	}
+	UpdateRoleResp {
+	    Id int64 `json:"id"`
+	}
+	DelRoleReq {
+	    Id int64 `form:"id"`
+	}
+	DelRoleResp {
+	    Id int64 `json:"id"`
+	}
+	InfoRoleReq {
+	    Id int64 `form:"id"`
+	}
+	InfoRoleResp {
+	    Id int64 `json:"id"`
+        BrandId int64 `json:"brandId"`
+        Name string `json:"name"`
+        Introduce string `json:"introduce"`
+        DeleteTime int64 `json:"deleteTime"`
+        CreateTime int64 `json:"createTime"`
+        UpdateTime int64 `json:"updateTime"`
+        
+	}
+	Role {
+        Id int64 `json:"id"`
+        BrandId int64 `json:"brandId"`
+        Name string `json:"name"`
+        Introduce string `json:"introduce"`
+        DeleteTime int64 `json:"deleteTime"`
+        CreateTime int64 `json:"createTime"`
+        UpdateTime int64 `json:"updateTime"`
+        
+    }
+	ListRoleReq {
+        Page       int    `form:"page,default=1,range=[1:200]"`
+        PageSize   int    `form:"pageSize,options=10|20|30|40,default=10"`
+	}
+	ListRoleResp {
+	    RoleList []Role `json:"role"`
+	    Total    int64  `json:"total"`
+	}
+)
+
+service account {
+	@doc(
+		summary: "添加Role"
+	)
+	@server(
+		handler: AddRoleHandler
+	)
+	post /medicine-account/role/add(AddRoleReq) returns (AddRoleResp)
+
+	@doc(
+		summary: "修改Role"
+	)
+	@server(
+		handler: UpdateRoleHandler
+	)
+	post /medicine-account/role/update(UpdateRoleReq) returns (UpdateRoleResp)
+
+	@doc(
+		summary: "删除Role"
+	)
+	@server(
+		handler: DelRoleHandler
+	)
+	get /medicine-account/role/del(DelRoleReq) returns (DelRoleResp)
+
+	@doc(
+		summary: "详情Role"
+	)
+	@server(
+		handler: InfoRoleHandler
+	)
+	get /medicine-account/role/info(InfoRoleReq) returns (InfoRoleResp)
+
+	@doc(
+		summary: "列表Role"
+	)
+	@server(
+		handler: ListRoleHandler
+	)
+	get /medicine-account/role/list(ListRoleReq) returns (ListRoleResp)
+}
