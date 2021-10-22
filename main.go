@@ -17,11 +17,6 @@ import (
 
 var url = flag.String("url", "dtd_db_test:5k2VUnDfqLxGnu@tcp(rm-bp1j6307pxpihh49090130.mysql.rds.aliyuncs.com:3306)/tch_cms", "数据库链接")
 var service = flag.String("service", "account", "服务名称")
-var files = []string{
-	"api",
-	"logic",
-	"model",
-}
 
 type TmplRecipient struct {
 	Table        string
@@ -80,36 +75,42 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 			tableDecListExpectAutoSet = append(tableDecListExpectAutoSet, v)
 		}
 	}
-	for _, v := range files {
-		buff := bytes.Buffer{}
-		data, err := ioutil.ReadFile(fmt.Sprintf("./tmpl/%v.tmpl", v))
-		if err != nil {
-			return err
+	fi, err := ioutil.ReadDir("./tmpl")
+	if err != nil {
+		return err
+	}
+	for _, v := range fi {
+		if !v.IsDir() {
+			buff := bytes.Buffer{}
+			data, err := ioutil.ReadFile(fmt.Sprintf("./tmpl/%v", v.Name()))
+			if err != nil {
+				return err
+			}
+			tmpl, err := template.New(fmt.Sprintf("./tmpl/%v", v.Name())).Funcs(template.FuncMap{
+				"Case2Camel": Case2Camel,
+				"Case2Mid": Case2Mid,
+				"DbType2Type": DbType2Type,
+				"Case2CamelFirst": Case2CamelFirst,
+			}).Parse(string(data))
+			if err != nil {
+				return err
+			}
+			err = tmpl.Execute(&buff, TmplRecipient{
+				Table:        table,
+				Service:      *service,
+				TableDecList: tableDecList,
+				TableDecListExpectAutoSet: tableDecListExpectAutoSet,
+			})
+			if err != nil {
+				return err
+			}
+			_ = os.MkdirAll(fmt.Sprintf("./builder/%v/", Case2Empty(table)), 0666)
+			suffix := ".go"
+			if strings.Contains(v.Name(), "api") {
+				suffix = ".api"
+			}
+			_ = ioutil.WriteFile(fmt.Sprintf("./builder/%v/%v", Case2Empty(table), Case2Empty(fmt.Sprintf("%v%v%v",table, strings.Replace(v.Name(), ".", "", -1), suffix))), buff.Bytes(), 0666)
 		}
-		tmpl, err := template.New(fmt.Sprintf("./tmpl/%v.tmpl", v)).Funcs(template.FuncMap{
-			"Case2Camel": Case2Camel,
-			"Case2Mid": Case2Mid,
-			"DbType2Type": DbType2Type,
-			"Case2CamelFirst": Case2CamelFirst,
-		}).Parse(string(data))
-		if err != nil {
-			return err
-		}
-		err = tmpl.Execute(&buff, TmplRecipient{
-			Table:        table,
-			Service:      *service,
-			TableDecList: tableDecList,
-			TableDecListExpectAutoSet: tableDecListExpectAutoSet,
-		})
-		if err != nil {
-			return err
-		}
-		_ = os.MkdirAll(fmt.Sprintf("./builder/%v/", Case2Empty(table)), 0666)
-		suffix := ".go"
-		if v == "api" {
-			suffix = ".api"
-		}
-		_ = ioutil.WriteFile(fmt.Sprintf("./builder/%v/%v", Case2Empty(table), Case2Empty(fmt.Sprintf("%v%v%v",table, v, suffix))), buff.Bytes(), 0666)
 	}
 	return nil
 }
