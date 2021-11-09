@@ -1,0 +1,106 @@
+syntax = "v1"
+
+info(
+	title: "中医-后台管理"
+	desc: "中医-后台管理."
+	author: "horizon"
+	email: "horizon@email.com"
+	version: "v1.0"
+)
+
+type (
+	AddRoleMenuReReq {
+	    BrandId int64 `json:"brandId,optional"`
+	    RoleId int64 `json:"roleId,optional"`
+	    MenuId int64 `json:"menuId,optional"`
+	    
+	}
+	AddRoleMenuReResp {
+		Id int64 `json:"id"`
+	}
+	UpdateRoleMenuReReq {
+	    Id int64 `json:"id"`
+        BrandId int64 `json:"brandId,optional"`
+        RoleId int64 `json:"roleId,optional"`
+        MenuId int64 `json:"menuId,optional"`
+        
+	}
+	UpdateRoleMenuReResp {
+	    Id int64 `json:"id"`
+	}
+	DelRoleMenuReReq {
+	    Id int64 `form:"id"`
+	}
+	DelRoleMenuReResp {
+	    Id int64 `json:"id"`
+	}
+	InfoRoleMenuReReq {
+	    Id int64 `form:"id"`
+	}
+	InfoRoleMenuReResp {
+	    Id int64 `json:"id"`
+        BrandId int64 `json:"brandId"`
+        RoleId int64 `json:"roleId"`
+        MenuId int64 `json:"menuId"`
+        CreateTime string `json:"createTime"`
+        
+	}
+	RoleMenuRe {
+        Id int64 `json:"id"`
+        BrandId int64 `json:"brandId"`
+        RoleId int64 `json:"roleId"`
+        MenuId int64 `json:"menuId"`
+        CreateTime string `json:"createTime"`
+        
+    }
+	ListRoleMenuReReq {
+        Page       int    `form:"page,default=1,range=[1:200]"`
+        PageSize   int    `form:"pageSize,options=10|20|30|40,default=10"`
+	}
+	ListRoleMenuReResp {
+	    RoleMenuReList []RoleMenuRe `json:"roleMenuRe"`
+	    Total    int64  `json:"total"`
+	}
+)
+
+service account {
+	@doc(
+		summary: "添加RoleMenuRe"
+	)
+	@server(
+		handler: AddRoleMenuReHandler
+	)
+	post /medicine-account/role-menu-re/add(AddRoleMenuReReq) returns (AddRoleMenuReResp)
+
+	@doc(
+		summary: "修改RoleMenuRe"
+	)
+	@server(
+		handler: UpdateRoleMenuReHandler
+	)
+	post /medicine-account/role-menu-re/update(UpdateRoleMenuReReq) returns (UpdateRoleMenuReResp)
+
+	@doc(
+		summary: "删除RoleMenuRe"
+	)
+	@server(
+		handler: DelRoleMenuReHandler
+	)
+	get /medicine-account/role-menu-re/del(DelRoleMenuReReq) returns (DelRoleMenuReResp)
+
+	@doc(
+		summary: "详情RoleMenuRe"
+	)
+	@server(
+		handler: InfoRoleMenuReHandler
+	)
+	get /medicine-account/role-menu-re/info(InfoRoleMenuReReq) returns (InfoRoleMenuReResp)
+
+	@doc(
+		summary: "列表RoleMenuRe"
+	)
+	@server(
+		handler: ListRoleMenuReHandler
+	)
+	get /medicine-account/role-menu-re/list(ListRoleMenuReReq) returns (ListRoleMenuReResp)
+}
