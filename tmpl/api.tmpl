@@ -1,64 +1,91 @@
-syntax = "v1"
-
-info(
-	title: "中医-后台管理"
-	desc: "中医-后台管理."
-	author: "horizon"
-	email: "horizon@email.com"
-	version: "v1.0"
-)
-
 type (
-	Add{{Case2Camel .Table}}Req {
-	    {{range $key, $value := .TableDecListExpectAutoSet}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
-	    {{end}}
-	}
-	Add{{Case2Camel .Table}}Resp {
-		Id int64 `json:"id"`
-	}
-	Update{{Case2Camel .Table}}Req {
-	    Id int64 `json:"id"`
+{{if .MainTable}}
+    Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Req {
+        {{Case2Camel .MainTable}}Id int64 `json:"{{Case2CamelFirst .MainTable}}Id"`
+        {{Case2Camel .MinorTable}}List []int64 `json:"{{Case2CamelFirst .MinorTable}}List"`
+    }
+    Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp {
+        {{Case2Camel .MainTable}}Id int64 `json:"{{Case2CamelFirst .MainTable}}Id"`
+    }
+    Get{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Req {
+        {{Case2Camel .MainTable}}Id int64 `json:"{{Case2CamelFirst .MainTable}}Id"`
+    }
+    Get{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp {
+        {{Case2Camel .MinorTable}}List []{{Case2Camel .MinorTable}} `json:"{{Case2CamelFirst .MinorTable}}List"`
+    }
+ {{else}}
+    Add{{Case2Camel .Table}}Req {
         {{range $key, $value := .TableDecListExpectAutoSet}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
         {{end}}
-	}
-	Update{{Case2Camel .Table}}Resp {
-	    Id int64 `json:"id"`
-	}
-	Del{{Case2Camel .Table}}Req {
-	    Id int64 `form:"id"`
-	}
-	Del{{Case2Camel .Table}}Resp {
-	    Id int64 `json:"id"`
-	}
-	Info{{Case2Camel .Table}}Req {
-	    Id int64 `form:"id"`
-	}
-	Info{{Case2Camel .Table}}Resp {
-	    {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}}"`
+    }
+    Add{{Case2Camel .Table}}Resp {
+        Id int64 `json:"id"`
+    }
+    Update{{Case2Camel .Table}}Req {
+        Id int64 `json:"id"`
+        {{range $key, $value := .TableDecListExpectAutoSet}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}},optional"`
         {{end}}
-	}
-	{{Case2Camel .Table}} {
+    }
+    Update{{Case2Camel .Table}}Resp {
+        Id int64 `json:"id"`
+    }
+    Del{{Case2Camel .Table}}Req {
+        Id int64 `form:"id"`
+    }
+    Del{{Case2Camel .Table}}Resp {
+        Id int64 `json:"id"`
+    }
+    Info{{Case2Camel .Table}}Req {
+        Id int64 `form:"id"`
+    }
+    Info{{Case2Camel .Table}}Resp {
         {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}}"`
         {{end}}
     }
-	List{{Case2Camel .Table}}Req {
+    {{Case2Camel .Table}} {
+        {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}} {{DbType2Type $value.Type}} `json:"{{Case2CamelFirst $value.Field}}"`
+        {{end}}
+    }
+    List{{Case2Camel .Table}}Req {
         Page       int    `form:"page,default=1,range=[1:200]"`
         PageSize   int    `form:"pageSize,options=10|20|30|40,default=10"`
-	}
-	List{{Case2Camel .Table}}Resp {
-	    {{Case2Camel .Table}}List []{{Case2Camel .Table}} `json:"{{Case2CamelFirst .Table}}"`
-	    Total    int64  `json:"total"`
-	}
+    }
+    List{{Case2Camel .Table}}Resp {
+        {{Case2Camel .Table}}List []{{Case2Camel .Table}} `json:"{{Case2CamelFirst .Table}}"`
+        Total    int64  `json:"total"`
+    }
+ {{end}}
 )
 
+@server(
+	jwt: JwtAuth
+	group: {{Case2Mid .Table}}
+)
 service {{Case2Mid .Service}} {
+{{if .MainTable}}
+    @doc(
+        summary: "设置Menu关系"
+    )
+    @server(
+        handler: Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Handler
+    )
+    post /{{Case2Mid .Service}}/{{Case2Mid .MainTable}}/set-{{Case2Mid .MinorTable}}(Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Req) returns (Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp)
+
+    @doc(
+        summary: "设置Department关系"
+    )
+    @server(
+        handler: Get{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Handler
+    )
+    post /{{Case2Mid .Service}}/{{Case2Mid .MainTable}}/get-{{Case2Mid .MinorTable}}(Get{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Req) returns (Get{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp)
+ {{else}}
 	@doc(
 		summary: "添加{{Case2Camel .Table}}"
 	)
 	@server(
 		handler: Add{{Case2Camel .Table}}Handler
 	)
-	post /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/add(Add{{Case2Camel .Table}}Req) returns (Add{{Case2Camel .Table}}Resp)
+	post /{{Case2Mid .Service}}/{{Case2Mid .Table}}/add(Add{{Case2Camel .Table}}Req) returns (Add{{Case2Camel .Table}}Resp)
 
 	@doc(
 		summary: "修改{{Case2Camel .Table}}"
@@ -66,7 +93,7 @@ service {{Case2Mid .Service}} {
 	@server(
 		handler: Update{{Case2Camel .Table}}Handler
 	)
-	post /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/update(Update{{Case2Camel .Table}}Req) returns (Update{{Case2Camel .Table}}Resp)
+	post /{{Case2Mid .Service}}/{{Case2Mid .Table}}/update(Update{{Case2Camel .Table}}Req) returns (Update{{Case2Camel .Table}}Resp)
 
 	@doc(
 		summary: "删除{{Case2Camel .Table}}"
@@ -74,7 +101,7 @@ service {{Case2Mid .Service}} {
 	@server(
 		handler: Del{{Case2Camel .Table}}Handler
 	)
-	get /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/del(Del{{Case2Camel .Table}}Req) returns (Del{{Case2Camel .Table}}Resp)
+	get /{{Case2Mid .Service}}/{{Case2Mid .Table}}/del(Del{{Case2Camel .Table}}Req) returns (Del{{Case2Camel .Table}}Resp)
 
 	@doc(
 		summary: "详情{{Case2Camel .Table}}"
@@ -82,7 +109,7 @@ service {{Case2Mid .Service}} {
 	@server(
 		handler: Info{{Case2Camel .Table}}Handler
 	)
-	get /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/info(Info{{Case2Camel .Table}}Req) returns (Info{{Case2Camel .Table}}Resp)
+	get /{{Case2Mid .Service}}/{{Case2Mid .Table}}/info(Info{{Case2Camel .Table}}Req) returns (Info{{Case2Camel .Table}}Resp)
 
 	@doc(
 		summary: "列表{{Case2Camel .Table}}"
@@ -90,5 +117,6 @@ service {{Case2Mid .Service}} {
 	@server(
 		handler: List{{Case2Camel .Table}}Handler
 	)
-	get /medicine-{{Case2Mid .Service}}/{{Case2Mid .Table}}/list(List{{Case2Camel .Table}}Req) returns (List{{Case2Camel .Table}}Resp)
+	get /{{Case2Mid .Service}}/{{Case2Mid .Table}}/list(List{{Case2Camel .Table}}Req) returns (List{{Case2Camel .Table}}Resp)
+ {{end}}
 }

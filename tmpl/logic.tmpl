@@ -1,0 +1,123 @@
+{{if .MainTable}}
+func (l *Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Logic) Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}(req types.Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Req, medAccountInfo *common.MedAccountInfo) (*types.Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp, error) {
+	list, err := l.svcCtx.{{Case2Camel .Table}}Model.All(model.{{Case2Camel .Table}}ListWhere{
+
+	})
+	if err != nil {
+		return nil, err
+	}
+	oldSet := collection.NewSet()
+	for _, v := range list {
+		oldSet.Add(v.{{Case2Camel .MinorTable}}Id)
+	}
+	// 修改数据
+	_ = l.svcCtx.{{Case2Camel .Table}}Model.DeleteIn(oldSet.KeysInt64()...)
+	insertAllList := make([]*model.{{Case2Camel .Table}}, 0, len(req.{{Case2Camel .MinorTable}}List))
+	for _, v := range req.{{Case2Camel .MinorTable}}List {
+		insertAllList = append(insertAllList, &model.{{Case2Camel .Table}}{
+
+		})
+	}
+	err = l.svcCtx.{{Case2Camel .Table}}Model.InsertAll(insertAllList)
+	if err != nil {
+		return nil, err
+	}
+	return &types.Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp{
+		{{Case2Camel .MainTable}}Id: req.{{Case2Camel .MainTable}}Id,
+	}, nil
+}
+
+func (l *Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Logic) Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}(req types.Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Req, medAccountInfo *common.MedAccountInfo) (*types.Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp, error) {
+	list, err := l.svcCtx.{{Case2Camel .Table}}Model.All(model.{{Case2Camel .Table}}ListWhere{
+	})
+	if err != nil {
+		return nil, err
+	}
+	oldSet := collection.NewSet()
+	for _, v := range list {
+		oldSet.Add(v.{{Case2Camel .MinorTable}}Id)
+	}
+	// 修改数据
+	_ = l.svcCtx.{{Case2Camel .Table}}Model.DeleteIn(oldSet.KeysInt64()...)
+	insertAllList := make([]*model.{{Case2Camel .Table}}, 0, len(req.{{Case2Camel .MinorTable}}List))
+	for _, v := range req.{{Case2Camel .MinorTable}}List {
+		insertAllList = append(insertAllList, &model.{{Case2Camel .Table}}{
+		})
+	}
+	err = l.svcCtx.{{Case2Camel .Table}}Model.InsertAll(insertAllList)
+	if err != nil {
+		return nil, err
+	}
+	return &types.Set{{Case2Camel .MainTable}}{{Case2Camel .MinorTable}}Resp{
+		{{Case2Camel .MainTable}}Id: req.{{Case2Camel .MainTable}}Id,
+	}, nil
+}
+{{else}}
+func (l *Add{{Case2Camel .Table}}Logic) Add{{Case2Camel .Table}}(req types.Add{{Case2Camel .Table}}Req, medAccountInfo *common.MedAccountInfo) (*types.Add{{Case2Camel .Table}}Resp, error) {
+    {{Case2CamelFirst .Table}}Id, err := l.svcCtx.{{Case2Camel .Table}}Model.Insert(model.{{Case2Camel .Table}}{
+        {{range $key, $value := .TableDecListExpectAutoSet}}{{Case2Camel $value.Field}}:req.{{Case2Camel $value.Field}},
+        {{end}}
+    })
+    if err != nil {
+        return nil, err
+    }
+    return &types.Add{{Case2Camel .Table}}Resp{
+        Id: {{Case2CamelFirst .Table}}Id,
+    }, nil
+}
+
+func (l *Del{{Case2Camel .Table}}Logic) Del{{Case2Camel .Table}}(req types.Del{{Case2Camel .Table}}Req, medAccountInfo *common.MedAccountInfo) (*types.Del{{Case2Camel .Table}}Resp, error) {
+    err := l.svcCtx.{{Case2Camel .Table}}Model.Delete(req.Id)
+    if err != nil {
+        return nil, err
+    }
+    return &types.Del{{Case2Camel .Table}}Resp{
+        Id: req.Id,
+    }, nil
+}
+
+func (l *Info{{Case2Camel .Table}}Logic) Info{{Case2Camel .Table}}(req types.Info{{Case2Camel .Table}}Req, medAccountInfo *common.MedAccountInfo) (*types.Info{{Case2Camel .Table}}Resp, error) {
+    Info, err := l.svcCtx.{{Case2Camel .Table}}Model.FindOne(req.Id)
+    if err != nil {
+        return nil, err
+    }
+    return &types.Info{{Case2Camel .Table}}Resp{{ "{" }}
+        {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}}:Info.{{Case2Camel $value.Field}},
+        {{end}}
+    {{ "}" }}, nil
+}
+
+func (l *List{{Case2Camel .Table}}Logic) List{{Case2Camel .Table}}(req types.List{{Case2Camel .Table}}Req, medAccountInfo *common.MedAccountInfo) (*types.List{{Case2Camel .Table}}Resp, error) {
+    list, total, err := l.svcCtx.{{Case2Camel .Table}}Model.List(req.Page, req.PageSize)
+    if err != nil {
+        return nil, err
+    }
+    {{Case2CamelFirst .Table}}List := make([]types.{{Case2Camel .Table}}, 0, len(list))
+    for _, v := range list {{ "{" }}
+        {{Case2CamelFirst .Table}}List = append({{Case2CamelFirst .Table}}List, types.{{Case2Camel .Table}}{
+            {{range $key, $value := .TableDecList}}{{Case2Camel $value.Field}}:v.{{Case2Camel $value.Field}},
+            {{end}}
+        })
+    {{ "}" }}
+    return &types.List{{Case2Camel .Table}}Resp {{ "{" }}
+        {{Case2Camel .Table}}List: {{Case2CamelFirst .Table}}List,
+        Total:    total,
+    {{ "}" }}, nil
+}
+
+func (l *Update{{Case2Camel .Table}}Logic) Update{{Case2Camel .Table}}(req types.Update{{Case2Camel .Table}}Req, medAccountInfo *common.MedAccountInfo) (*types.Update{{Case2Camel .Table}}Resp, error) {
+    info, err := l.svcCtx.{{Case2Camel .Table}}Model.FindOne(req.Id)
+    if err != nil {
+        return nil, err
+    }
+    {{range $key, $value := .TableDecList}}info.{{Case2Camel $value.Field}} = req.{{Case2Camel $value.Field}},
+    {{end}}
+    err = l.svcCtx.{{Case2Camel .Table}}Model.Update(*info)
+    if err != nil {
+        return nil, err
+    }
+    return &types.Update{{Case2Camel .Table}}Resp{
+        Id: req.Id,
+    }, nil
+}
+{{end}}

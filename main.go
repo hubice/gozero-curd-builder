@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -29,6 +30,8 @@ var expectAutoSet = []string{
 
 type TmplData struct {
 	Table                     string
+	MainTable                 string
+	MinorTable                string
 	Service                   string
 	TableDecList              []utils.TableDec
 	TableDecListExpectAutoSet []utils.TableDec
@@ -85,9 +88,16 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 	}
 	tmplData := TmplData{
 		Table:                     table,
+		MainTable:                 "",
+		MinorTable:                "",
 		Service:                   *service,
 		TableDecList:              tableDecList,
 		TableDecListExpectAutoSet: tableDecListExpectAutoSet,
+	}
+	tableSplit := strings.Split(table, "_")
+	if tableSplit[len(tableSplit)-1] == "re" && len(tableSplit) >= 3 {
+		tmplData.MainTable = tableSplit[0]
+		tmplData.MinorTable = strings.Join(tableSplit[1:len(tableSplit)-1], "_")
 	}
 	// 生成方法
 	tmplFunc := template.FuncMap{
