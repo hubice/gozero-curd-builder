@@ -28,9 +28,9 @@ var expectAutoSet = []string{
 }
 
 type TmplData struct {
-	Table        string
-	Service      string
-	TableDecList []utils.TableDec
+	Table                     string
+	Service                   string
+	TableDecList              []utils.TableDec
 	TableDecListExpectAutoSet []utils.TableDec
 }
 
@@ -84,16 +84,16 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 		}
 	}
 	tmplData := TmplData{
-		Table:        table,
-		Service:      *service,
-		TableDecList: tableDecList,
+		Table:                     table,
+		Service:                   *service,
+		TableDecList:              tableDecList,
 		TableDecListExpectAutoSet: tableDecListExpectAutoSet,
 	}
 	// 生成方法
 	tmplFunc := template.FuncMap{
-		"Case2Camel": utils.Case2Camel,
-		"Case2Mid": utils.Case2Mid,
-		"DbType2Type": utils.DbType2Type,
+		"Case2Camel":      utils.Case2Camel,
+		"Case2Mid":        utils.Case2Mid,
+		"DbType2Type":     utils.DbType2Type,
 		"Case2CamelFirst": utils.Case2CamelFirst,
 	}
 	// 写入数据
@@ -120,7 +120,7 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			err = ioutil.WriteFile(fmt.Sprintf("%v/%v/%v", baseDir + "builder",  utils.Case2Empty(table), v.Name()), buff.Bytes(), 0666)
+			err = ioutil.WriteFile(fmt.Sprintf("%v/%v/%v", baseDir+"builder", utils.Case2Empty(table), v.Name()), buff.Bytes(), 0666)
 			if err != nil {
 				return err
 			}
