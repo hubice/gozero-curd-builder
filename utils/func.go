@@ -15,6 +15,8 @@ func DbType2Type(name string) string {
 	for k, v := range list {
 		if strings.Contains(name, k) {
 			return v
+		} else {
+			return "string"
 		}
 	}
 	return name

@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"text/template"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -21,7 +20,7 @@ var database = flag.String("url", "med_cms", "数据库链接")
 var service = flag.String("service", "account", "服务名称")
 
 var baseDir = "./tmpl/"
-var expectAutoSet = []string{
+var excludeField = []string{
 	"id",
 	"create_time",
 	"update_time",
@@ -30,11 +29,9 @@ var expectAutoSet = []string{
 
 type TmplData struct {
 	Table                     string
-	MainTable                 string
-	MinorTable                string
 	Service                   string
 	TableDecList              []utils.TableDec
-	TableDecListExpectAutoSet []utils.TableDec
+	TableDecListExcludeField  []utils.TableDec
 }
 
 func main() {
@@ -72,41 +69,34 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	// 生成数据
-	tableDecListExpectAutoSet := make([]utils.TableDec, 0)
+	// 数据
+	tableDecListExcludeField := make([]utils.TableDec, 0)
 	for _, v := range tableDecList {
 		isAutoSet := false
-		for _, f := range expectAutoSet {
+		for _, f := range excludeField {
 			if v.Field == f {
 				isAutoSet = true
 				break
 			}
 		}
 		if !isAutoSet {
-			tableDecListExpectAutoSet = append(tableDecListExpectAutoSet, v)
+			tableDecListExcludeField = append(tableDecListExcludeField, v)
 		}
 	}
 	tmplData := TmplData{
 		Table:                     table,
-		MainTable:                 "",
-		MinorTable:                "",
 		Service:                   *service,
 		TableDecList:              tableDecList,
-		TableDecListExpectAutoSet: tableDecListExpectAutoSet,
+		TableDecListExcludeField:  tableDecListExcludeField,
 	}
-	tableSplit := strings.Split(table, "_")
-	if tableSplit[len(tableSplit)-1] == "re" && len(tableSplit) >= 3 {
-		tmplData.MainTable = tableSplit[0]
-		tmplData.MinorTable = strings.Join(tableSplit[1:len(tableSplit)-1], "_")
-	}
-	// 生成方法
+	// 方法
 	tmplFunc := template.FuncMap{
 		"Case2Camel":      utils.Case2Camel,
 		"Case2Mid":        utils.Case2Mid,
 		"DbType2Type":     utils.DbType2Type,
 		"Case2CamelFirst": utils.Case2CamelFirst,
 	}
-	// 写入数据
+	// 创建
 	fi, err := ioutil.ReadDir(baseDir)
 	if err != nil {
 		return err
