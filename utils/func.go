@@ -22,8 +22,8 @@ func DbType2Type(name string) string {
 	return name
 }
 
-// Case2CamelFirst 下划线转换成大写驼峰
-func Case2CamelFirst(name string) string {
+// Case2CamelUpper 下划线转换成大写驼峰
+func Case2CamelUpper(name string) string {
 	name = strings.Replace(name, "_", " ", -1)
 	name = strings.Title(name)
 	name = strings.Replace(name, " ", "", -1)

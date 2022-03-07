@@ -16,29 +16,20 @@ import (
 	"gozero-curd-builder/utils"
 )
 
-var database = flag.String("url", "med_cms", "数据库链接")
-var service = flag.String("service", "account", "服务名称")
+var database = flag.String("url", "database", "数据库链接")
 
 var baseDir = "./tmpl/"
-var excludeField = []string{
-	"id",
-	"create_time",
-	"update_time",
-	"delete_time",
-}
 
 type TmplData struct {
-	Table                     string
-	Service                   string
-	TableDecList              []utils.TableDec
-	TableDecListExcludeField  []utils.TableDec
+	Table                    string
+	TableDecList             []utils.TableDec
 }
 
 func main() {
 	flag.Parse()
 
 	if len(*database) == 0 {
-		log.Fatalln("必须输入数据库链接")
+		log.Fatalln("输入错误:必须输入数据库链接")
 		return
 	}
 	db, err := sql.Open("mysql", *database)
@@ -58,7 +49,7 @@ func main() {
 		for _, v := range tableList {
 			err = builder(v, db, ctx)
 			if err != nil {
-				log.Fatalf("生成错误 %v", err)
+				log.Fatalf("生成错误:%v", err)
 			}
 		}
 	}
@@ -69,32 +60,16 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	// 数据
-	tableDecListExcludeField := make([]utils.TableDec, 0)
-	for _, v := range tableDecList {
-		isAutoSet := false
-		for _, f := range excludeField {
-			if v.Field == f {
-				isAutoSet = true
-				break
-			}
-		}
-		if !isAutoSet {
-			tableDecListExcludeField = append(tableDecListExcludeField, v)
-		}
-	}
 	tmplData := TmplData{
-		Table:                     table,
-		Service:                   *service,
-		TableDecList:              tableDecList,
-		TableDecListExcludeField:  tableDecListExcludeField,
+		Table:        table,
+		TableDecList: tableDecList,
 	}
 	// 方法
 	tmplFunc := template.FuncMap{
 		"Case2Camel":      utils.Case2Camel,
 		"Case2Mid":        utils.Case2Mid,
+		"Case2CamelUpper": utils.Case2CamelUpper,
 		"DbType2Type":     utils.DbType2Type,
-		"Case2CamelFirst": utils.Case2CamelFirst,
 	}
 	// 创建
 	fi, err := ioutil.ReadDir(baseDir)
