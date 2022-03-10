@@ -22,16 +22,16 @@ func DbType2Type(name string) string {
 	return name
 }
 
-// Case2CamelUpper 下划线转换成大写驼峰
-func Case2CamelUpper(name string) string {
+// Case2CamelLower 下划线转换成小写驼峰
+func Case2CamelLower(name string) string {
 	name = strings.Replace(name, "_", " ", -1)
 	name = strings.Title(name)
 	name = strings.Replace(name, " ", "", -1)
 	return strings.ToLower(name[0:1]) + name[1:]
 }
 
-// Case2Camel 下划线转换成小写驼峰
-func Case2Camel(name string) string {
+// Case2CamelUpper 下划线转换成大写驼峰
+func Case2CamelUpper(name string) string {
 	name = strings.Replace(name, "_", " ", -1)
 	name = strings.Title(name)
 	return strings.Replace(name, " ", "", -1)

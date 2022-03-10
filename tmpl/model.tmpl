@@ -1,6 +1,6 @@
-func (m *{{Case2Camel .Table}}Model) Insert(data {{Case2Camel .Table}}) (int64, error) {
+func (m *{{Case2CamelUpper .Table}}Model) Insert(data *{{Case2CamelUpper .Table}}) (int64, error) {
 	insert := builder.Eq{
-        {{range $key, $value := .TableDecListExpectAutoSet}}"{{$value.Field}}": data.{{Case2Camel $value.Field}},
+        {{range $key, $value := .TableDecList}}"{{$value.Field}}": data.{{Case2CamelUpper $value.Field}},
         {{end}}
 	}
 	toSQL, i, err := builder.Insert(insert).Into(m.table).ToSQL()
@@ -14,11 +14,11 @@ func (m *{{Case2Camel .Table}}Model) Insert(data {{Case2Camel .Table}}) (int64, 
 	return ret.LastInsertId()
 }
 
-func (m *MenuModel) All({{Case2CamelFirst .Table}}Where {{Case2Camel .Table}}Where) ([]*Menu, error) {
+func (m *{{Case2CamelUpper .Table}}Model) All({{Case2CamelLower .Table}}Where *{{Case2CamelUpper .Table}}Where) ([]*Menu, error) {
 	where := builder.Eq{
 	}.And()
-	resp := make([]*Menu, 0)
-	query, args, err := builder.Dialect(builder.MYSQL).Select({{Case2CamelFirst .Table}}Rows).From(m.table).Where(where).ToSQL()
+	resp := make([]*{{Case2CamelUpper .Table}}, 0)
+	query, args, err := builder.Dialect(builder.MYSQL).Select({{Case2CamelLower .Table}}Rows).From(m.table).Where(where).ToSQL()
 	if err != nil {
 		return nil, err
 	}
@@ -26,14 +26,14 @@ func (m *MenuModel) All({{Case2CamelFirst .Table}}Where {{Case2Camel .Table}}Whe
 	return resp, nil
 }
 
-func (m *{{Case2Camel .Table}}Model) List({{Case2CamelFirst .Table}}Where {{Case2Camel .Table}}Where, page, pageSize int) ([]*{{Case2Camel .Table}}, int64, error) {
+func (m *{{Case2CamelUpper .Table}}Model) List({{Case2CamelLower .Table}}Where *{{Case2CamelUpper .Table}}Where, page, pageSize int) ([]*{{Case2CamelUpper .Table}}, int64, error) {
 	where := builder.Eq{}
 
 	var total int64
-	resp := make([]*{{Case2Camel .Table}}, 0)
+	resp := make([]*{{Case2CamelUpper .Table}}, 0)
 	err := mr.Finish(func() error {
 		offset := (page - 1) * pageSize
-		query, args, err := builder.Dialect(builder.MYSQL).Select({{Case2CamelFirst .Table}}Rows).From(m.table).Where(where).Limit(pageSize, offset).ToSQL()
+		query, args, err := builder.Dialect(builder.MYSQL).Select({{Case2CamelLower .Table}}Rows).From(m.table).Where(where).Limit(pageSize, offset).ToSQL()
 		if err != nil {
 			return err
 		}
@@ -48,40 +48,40 @@ func (m *{{Case2Camel .Table}}Model) List({{Case2CamelFirst .Table}}Where {{Case
 	return resp, total, err
 }
 
-
-func (m *{{Case2Camel .Table}}Model) InsertAll(list []*{{Case2Camel .Table}}) error {
+func (m *{{Case2CamelUpper .Table}}Model) InsertAll(list []*{{Case2CamelUpper .Table}}) error {
 	insert := builder.Eq{
-        {{range $key, $value := .TableDecListExpectAutoSet}}"{{$value.Field}}": "",
+        {{range $key, $value := .TableDecList}}"{{$value.Field}}": "",
         {{end}}
 	}
 	query, _, err := builder.Insert(insert).Into(m.table).ToSQL()
 	if err != nil {
 		return err
 	}
-	var bulk *sqlx.BulkInserter
-	bulk, _ = sqlx.NewBulkInserter(m.conn, query) //注意：批量插入不能重复实例化
+    bulk{{Case2CamelLower .Table}}Once.Do(func() {
+        bulk{{Case2CamelLower .Table}}, _ = sqlx.NewBulkInserter(m.db, query) //注意：批量插入不能重复实例化
+    })
 	for i, data := range list {
 		insert := builder.Eq{
-	        {{range $key, $value := .TableDecListExpectAutoSet}}"{{$value.Field}}": data.{{Case2Camel $value.Field}},
+	        {{range $key, $value := .TableDecList}}"{{$value.Field}}": data.{{Case2CamelUpper $value.Field}},
             {{end}}
 		}
 		_, args, err := builder.Insert(insert).Into(m.table).ToSQL()
-		err = bulk.Insert(args...)
+		err = bulk{{Case2CamelLower .Table}}.Insert(args...)
 		if err != nil {
-			logx.Errorf("called {{Case2Camel .Table}}Model InsertAll exec: %s", err)
+			logx.Errorf("called {{Case2CamelUpper .Table}}Model InsertAll exec: %s", err)
 			continue
 		}
 		if i != 0 && i%1000 == 0 {
-			bulk.Flush()
+			bulk{{Case2CamelLower .Table}}.Flush()
 		}
 	}
-	bulk.Flush()
+	bulk{{Case2CamelLower .Table}}.Flush()
 	return nil
 }
 
-func (m *{{Case2Camel .Table}}Model) Update(data {{Case2Camel .Table}}) error {
+func (m *{{Case2CamelUpper .Table}}Model) Update(data *{{Case2CamelUpper .Table}}) error {
 	update := builder.Eq{
-        {{range $key, $value := .TableDecListExpectAutoSet}}"{{$value.Field}}": data.{{Case2Camel $value.Field}},
+        {{range $key, $value := .TableDecList}}"{{$value.Field}}": data.{{Case2CamelUpper $value.Field}},
         {{end}}
 	}
 	toSQL, i, err := builder.Update(update).From(m.table).Where(builder.Eq{"id": data.Id}).ToSQL()

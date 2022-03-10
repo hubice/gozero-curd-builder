@@ -10,14 +10,17 @@ import (
 type TableDec struct {
 	Field   string
 	Type    string
+	Collation interface{}
 	Null    string
 	Key     string
 	Default interface{}
 	Extra   string
+	Privileges string
+	Comment string
 }
 
 func TableInfo(table string, db *sql.DB, ctx context.Context) ([]TableDec, error) {
-	rows, err := db.QueryContext(ctx, fmt.Sprintf("DESCRIBE %v", table))
+	rows, err := db.QueryContext(ctx, fmt.Sprintf("SHOW FULL COLUMNS FROM %v", table))
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +30,8 @@ func TableInfo(table string, db *sql.DB, ctx context.Context) ([]TableDec, error
 	tableDecList := make([]TableDec, 0)
 	for rows.Next() {
 		tableDec := TableDec{}
-		if err := rows.Scan(&tableDec.Field, &tableDec.Type, &tableDec.Null, &tableDec.Key, &tableDec.Default, &tableDec.Key); err != nil {
+		if err := rows.Scan(&tableDec.Field, &tableDec.Type, &tableDec.Collation, &tableDec.Null, &tableDec.Key,
+			&tableDec.Default, &tableDec.Extra, &tableDec.Privileges, &tableDec.Comment); err != nil {
 			log.Fatal(err)
 		}
 		tableDecList = append(tableDecList, tableDec)

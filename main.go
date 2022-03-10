@@ -16,7 +16,7 @@ import (
 	"gozero-curd-builder/utils"
 )
 
-var database = flag.String("url", "database", "数据库链接")
+var database = flag.String("url", "", "数据库链接")
 
 var baseDir = "./tmpl/"
 
@@ -66,9 +66,9 @@ func builder(table string, db *sql.DB, ctx context.Context) error {
 	}
 	// 方法
 	tmplFunc := template.FuncMap{
-		"Case2Camel":      utils.Case2Camel,
-		"Case2Mid":        utils.Case2Mid,
+		"Case2CamelLower": utils.Case2CamelLower,
 		"Case2CamelUpper": utils.Case2CamelUpper,
+		"Case2Mid":        utils.Case2Mid,
 		"DbType2Type":     utils.DbType2Type,
 	}
 	// 创建
