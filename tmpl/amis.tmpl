@@ -1,0 +1,197 @@
+{
+    "type": "page",
+    "name": "page",
+    "toolbar": [],
+    "initApi": {
+      "method": "get",
+      "url": "xxxx",
+      "responseData": {
+        "xxxx": "${xxx}"
+      }
+    },
+    "pageField": "page",
+    "perPageField": "pageSize",
+    "body": [
+      {
+        "name": "crud",
+        "type": "crud",
+        "api": {
+          "method": "get",
+          "url": "https://test.tianniuyun.com/admin/pos/report/pc-employee-clock",
+          "data": {
+            "shopIds": "${shopIds.shopIds}",
+            "timeType": "${timeType}",
+            "startTime": "${startTime}",
+            "endTime": "${endTime}",
+            "type": "${type}",
+            "page": "${page}"
+          },
+          "responseData": {
+            "items": "${employeeClock}",
+            "total": "${total}"
+          }
+        },
+        "syncLocation": false,
+        "headerToolbar": [
+          {
+            "align": "right",
+            "type": "columns-toggler"
+          }
+        ],
+        "filter": {
+          "title": "查询条件",
+          "trimValues": true,
+          "controls": [
+            {
+              "type": "group",
+              "label": "时间范围",
+              "required": "",
+              "body": [
+                {
+                  "type": "button-group-select",
+                  "name": "timeType",
+                  "value": "lastMonth",
+                  "btnActiveLevel": "primary",
+                  "options": [
+                    {
+                      "label": "昨天",
+                      "value": "yesterday"
+                    },
+                    {
+                      "label": "本周",
+                      "value": "thisWeek"
+                    },
+                    {
+                      "label": "上周",
+                      "value": "lastWeek"
+                    },
+                    {
+                      "label": "本月",
+                      "value": "thisMonth"
+                    },
+                    {
+                      "label": "上月",
+                      "value": "lastMonth"
+                    },
+                    {
+                      "label": "自定义",
+                      "value": "custom"
+                    }
+                  ]
+                },
+                {
+                  "type": "input-date",
+                  "name": "startTime",
+                  "maxDate": "${endTime}",
+                  "visibleOn": "data.timeType == 'custom'",
+                  "format": "YYYY-MM-DD"
+                },
+                {
+                  "type": "input-date",
+                  "name": "endTime",
+                  "minDate": "${startTime}",
+                  "visibleOn": "data.timeType == 'custom'",
+                  "format": "YYYY-MM-DD"
+                }
+              ]
+            },
+            {
+              "type": "radios",
+              "name": "type",
+              "label": "快速筛选",
+              "value": 0,
+              "options": [
+                {
+                  "label": "全部",
+                  "value": 0
+                },
+                {
+                  "label": "超时下钟",
+                  "value": 1
+                },
+                {
+                  "label": "提前下钟",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "control",
+              "label": "",
+              "body": [
+                {
+                  "level": "primary",
+                  "type": "submit",
+                  "label": "查询"
+                }
+              ]
+            },
+            {
+              "type": "control",
+              "label": "",
+              "body": [
+                {
+                  "type": "reset",
+                  "label": "重置"
+                }
+              ]
+            }
+          ]
+        },
+        "columns": [
+          {
+            "label": "门店",
+            "tpl": "<%= this.shopNo %>-<%= this.shopName %>"
+          },
+          {
+            "label": "员工信息",
+            "tpl": "<%= this.accountShortNo %><%= this.accountName %>"
+          },
+          {
+            "label": "房间号",
+            "name": "roomSn"
+          },
+          {
+            "label": "项目",
+            "tpl": "<%= this.serviceSn %>-<%= this.serviceName %>"
+          },
+          {
+            "label": "服务时长",
+            "tpl": "${INT(serviceTime/60)}分钟"
+          },
+          {
+            "type": "status",
+            "label": "上钟类型",
+            "name": "clockType",
+            "map": {},
+            "labelMap": {
+              "1": "轮钟",
+              "2": "挑排",
+              "3": "点钟",
+              "4": "选排"
+            }
+          },
+          {
+            "label": "上钟时间",
+            "tpl": "<%= date(this.realEndTime, 'YYYY-MM-DD HH:mm:ss') %>"
+          },
+          {
+            "label": "下钟时间",
+            "tpl": "<%= date(this.realStartTime, 'YYYY-MM-DD HH:mm:ss') %>"
+          },
+          {
+            "label": "提前下钟",
+            "tpl": "${INT(aheadTime/60)}分钟"
+          },
+          {
+            "label": "晚下钟",
+            "tpl": "${INT(lateTime/60)}分钟"
+          },
+          {
+            "label": "收银端订单编号",
+            "name": "orderNo"
+          }
+        ]
+      }
+    ]
+  }
